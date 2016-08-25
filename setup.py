@@ -22,8 +22,6 @@ setup(name='telemetry_client',
       license='GPL',
       packages=['telemetry_client'],
       install_requires=[
-          'urllib',
-          'urllib2',
           'ondd_ipc',
           'netifaces'
       ],
