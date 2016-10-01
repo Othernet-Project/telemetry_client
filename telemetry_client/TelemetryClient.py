@@ -37,8 +37,8 @@ class TelemetryClient:
         self.collectors = Collectors(self.items)
 
         self.onddclient = ONDDClient(src_config["endpoint"])
-        self.ondd_thread = IntervalTimer(int(src_config["interval"]), self.ondd_worker)
-        self.uplink_thread = IntervalTimer(int(dest_config["interval"]), self.uplink_worker)
+        self.ondd_thread = None
+        self.uplink_thread = None
 
     def ondd_worker(self):
         values = self.onddclient.get_status()
@@ -46,9 +46,9 @@ class TelemetryClient:
         self.collectors.update(values)               
 
     def uplink_worker(self):
-        if not self.ondd_thread.isAlive():
+        if not self.ondd_thread or not self.ondd_thread.isAlive():
+            self.ondd_thread = IntervalTimer(int(self.src_config["interval"]), self.ondd_worker)
             self.ondd_thread.start()
-            return
 
         self.ondd_thread.pause()
         values = self.collectors.get()
@@ -56,7 +56,9 @@ class TelemetryClient:
         self.ondd_thread.unpause()
 
     def start(self):
-        self.uplink_thread.start()
         while True:
-            sleep(1)
+            if not self.uplink_thread or not self.uplink_thread.isAlive():
+                self.uplink_thread = IntervalTimer(int(self.dest_config["interval"]), self.uplink_worker)
+                self.uplink_thread.start()
+            sleep(10)
 
