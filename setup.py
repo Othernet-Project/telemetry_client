@@ -7,7 +7,7 @@ def readme():
 
 
 setup(name='telemetry_client',
-      version='0.9',
+      version='1.0',
       description='Outernet Telemetry Client',
       long_description=readme(),
       classifiers=[
